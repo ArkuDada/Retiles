@@ -107,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)../lib/glm;$(ProjectDir)../lib/glew-1.13.0/include;$(ProjectDir)../lib/glfw-3.1.2.bin.WIN32/include/GLFW;$(ProjectDir)../lib/irrklang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../lib/glm;$(ProjectDir)../lib/glew-1.13.0/include;$(ProjectDir)../lib/glfw-3.1.2.bin.WIN32/include/GLFW;E:\CT\year1\DT170\HoardSurvivor\Hoard\lib\irrklang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

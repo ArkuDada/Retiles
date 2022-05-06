@@ -12,5 +12,9 @@ public:
 	void Tick(float);
 	bool TimerEnd();
 	void TimerReset();
+	void TimerReset(float);
+
+	bool GetActive() { return isActive; }
+	void SetActive(bool f) { isActive = f; }
 };
 

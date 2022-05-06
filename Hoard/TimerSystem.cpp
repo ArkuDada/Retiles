@@ -29,3 +29,7 @@ void TimerSystem::TimerReset()
 {
 	tick = tickStart;
 }
+void TimerSystem::TimerReset(float newStart)
+{
+	tick = tickStart = newStart;
+}

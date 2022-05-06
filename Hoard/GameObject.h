@@ -13,6 +13,11 @@ public:
 	glm::vec3		scale;				// usually we will use only x and y
 	float			orientation;		// 0 radians is 3 o'clock, PI/2 radian is 12 o'clock
 	glm::mat4		modelMatrix;
+	GameObject*		target;
+
+	int value;
+	int health;
+	float damage;
 
 	GameObject(CDTMesh* , CDTTex* ,int ,int , glm::vec3 , glm::vec3 , glm::vec3 , float );
 };
