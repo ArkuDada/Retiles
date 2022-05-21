@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CDT.cpp" />
+    <ClCompile Include="GameStateLevel1.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="system.cpp" />
+    <ClCompile Include="TimerSystem.cpp" />
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObj\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>GameObj\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>GameObj\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimatedObject.cpp">
+      <Filter>GameObj\Advance</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicObject.cpp">
+      <Filter>GameObj\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>GameObj\Implement</Filter>
+    </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CDT.h" />
+    <ClInclude Include="GameStateLevel1.h" />
+    <ClInclude Include="shader.hpp" />
+    <ClInclude Include="SOIL.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="TimerSystem.h" />
+    <ClInclude Include="GameObject.h">
+      <Filter>GameObj\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>GameObj\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>GameObj\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedObject.h">
+      <Filter>GameObj\Advance</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicObject.h">
+      <Filter>GameObj\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>GameObj\Implement</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GameObj">
+      <UniqueIdentifier>{a073f415-8660-40cc-b010-5c8bf343af63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObj\Standard">
+      <UniqueIdentifier>{a5be362c-9d82-4388-9c07-13000511d984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObj\Advance">
+      <UniqueIdentifier>{efca7458-0563-4925-a2b2-6ac645c2ac25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObj\Implement">
+      <UniqueIdentifier>{6598b669-363b-4e7e-9d1f-8665010942c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{894c6ecf-c4ee-47d2-adaf-cf939f0982e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

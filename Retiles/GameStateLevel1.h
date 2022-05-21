@@ -18,6 +18,10 @@ extern GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/random.hpp>
 
+//IrrKlang
+#include <irrKlang.h>
+using namespace irrklang;
+
 // ---------------------------------------------------------------------------
 
 void GameStateLevel1Load(void);
