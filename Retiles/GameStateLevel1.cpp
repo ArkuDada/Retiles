@@ -46,8 +46,8 @@ void GameStateLevel1Load(void)
 	levels.push_back(new Level("Maps/Levels/Level5.txt"));
 	levels.push_back(new Level("Maps/Levels/Level6.txt"));
 
-	currLevel =levels[5];
-	//currLevel = new Level(levels[0], chunks);
+	//currLevel =levels[5];
+	currLevel = new Level(levels[5], chunks);
 	currLevel->Debug();
 
 	//load in sprite
@@ -75,18 +75,22 @@ void GameStateLevel1Init(void) {
 
 void CheckGameMode()
 {
-	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
 	{
-		gamemode = !gamemode;
-		if (gamemode)
-		{
-			
-		}
-		else
-		{
-		}
+		gamemode = true;
+		SetCamZoom(1.0f);
+		
+	}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+	{
+		gamemode = false;
+		SetCamZoom(3.5f);
 	}
 }
+
+void PlatfromModeUpdate(double dt, long frame, int& state) {}
+
+void BuildModeUpdate(double dt, long frame, int& state) {}
 
 void GameStateLevel1Update(double dt, long frame, int& state) {
 
@@ -103,7 +107,14 @@ void GameStateLevel1Update(double dt, long frame, int& state) {
 		ZoomOut(0.1f);
 	}
 
-	
+	if (gamemode)
+	{
+		PlatfromModeUpdate(dt, frame, state);
+	}
+	else
+	{
+		BuildModeUpdate(dt, frame, state);
+	}
 
 	//---------------------------------------------------------
 	// Update all game obj position using velocity 
@@ -146,7 +157,7 @@ void GameStateLevel1Draw(void) {
 		gameObject->Draw();
 	}
 
-	currLevel->Draw(sprites[ObjectType::tiles]);
+	currLevel->Draw(sprites[ObjectType::tiles], gamemode);
 	// Swap the buffer, to present the drawing
 	glfwSwapBuffers(window);
 }
@@ -166,9 +177,17 @@ void GameStateLevel1Free(void)
 
 void GameStateLevel1Unload(void) {
 
-	for (auto gameObject : sprites)
+	for (auto ch : chunks)
 	{
-		delete gameObject;
+		delete ch;
+	}
+	for (auto lvl : levels)
+	{
+		delete lvl;
+	}
+	for (auto spr : sprites)
+	{
+		delete spr;
 	}
 
 	printf("Level1: Unload\n");

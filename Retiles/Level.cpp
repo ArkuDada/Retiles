@@ -88,9 +88,9 @@ Level::Level(Level* ori, vector<Chunk*> overlay)
 	//Debug();
 }
 
-void Level::Draw(Sprite* sprite)
+void Level::Draw(Sprite* sprite,bool focus)
 {
-	glm::mat4 tMat = glm::translate(glm::mat4(1.0f), glm::vec3(-MapSize.x / 2.0f, -MapSize.y / 2.0f, 0.0f));
+	glm::mat4 tMat = focus?glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f,-5.0f, 0.0f)): glm::translate(glm::mat4(1.0f), glm::vec3(-MapSize.x / 2.0f, -MapSize.y / 2.0f, 0.0f));
 	glm::mat4 sMat = glm::scale(glm::mat4(1.0f), glm::vec3(CELL_SIZE, CELL_SIZE, 1.0f));
 	glm::mat4 sMapMatrix = sMat * tMat;
 	glm::mat4 matTransform;

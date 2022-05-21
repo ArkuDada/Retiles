@@ -48,7 +48,7 @@ public:
 	Level(string filename);
 	Level(Level* base, vector<Chunk*> overlay);
 	string GetLevelName() { return levelName; }
-	void Draw(Sprite*);
+	void Draw(Sprite*,bool);
 	void Debug();
 };
 
