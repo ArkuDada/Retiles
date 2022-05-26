@@ -1,4 +1,8 @@
 #include "Level.h"
+#include "Collision.h"
+
+
+#include <iostream>
 #include <fstream>
 
 void Level::appendSpecialTiles()
@@ -90,7 +94,7 @@ Level::Level(Level* ori, vector<Chunk*> overlay)
 
 void Level::Draw(Sprite* sprite,bool focus)
 {
-	glm::mat4 tMat = focus?glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f,-5.0f, 0.0f)): glm::translate(glm::mat4(1.0f), glm::vec3(-MapSize.x / 2.0f, -MapSize.y / 2.0f, 0.0f));
+	glm::mat4 tMat = focus?glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f, 0.0f)): glm::translate(glm::mat4(1.0f), glm::vec3(-MapSize.x / 2.0f, -MapSize.y / 2.0f, 0.0f));
 	glm::mat4 sMat = glm::scale(glm::mat4(1.0f), glm::vec3(CELL_SIZE, CELL_SIZE, 1.0f));
 	glm::mat4 sMapMatrix = sMat * tMat;
 	glm::mat4 matTransform;
@@ -101,7 +105,7 @@ void Level::Draw(Sprite* sprite,bool focus)
 		for (int x = 0; x < MapSize.x; x++)
 		{
 			int tileValue = levelGrid[y][x];
-			if (tileValue >= 1)
+			if (tileValue == Tiles::block)
 			{
 				//+ Find transformation matrix of each cell, cellMatrix is just a translation matrix
 				cellMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + 0.5f, (MapSize.y - y) - 0.5f, 0.0f));
@@ -120,6 +124,48 @@ void Level::Draw(Sprite* sprite,bool focus)
 		}
 
 	}
+}
+
+glm::vec3 Level::mapToWorld(Cordinate cord, bool focus)
+{
+	glm::vec3 result = glm::vec3(cord.x * CELL_SIZE + CELL_SIZE/2, cord.y* CELL_SIZE + CELL_SIZE/2, 0.0f);
+
+	if (!focus) result += glm::vec3(-MapSize.x * CELL_SIZE / 2.0f, -MapSize.y * CELL_SIZE / 2.0f, 0.0f);
+	return result;
+}
+
+int Level::checkCollision(glm::vec3 position)
+{
+	float PosX = (position.x- CELL_SIZE / 2)/CELL_SIZE + 0.5f;
+	float PosY = (position.y - CELL_SIZE / 2) / CELL_SIZE + 0.5f;
+	std::cout << PosX << "," << PosY << endl;
+	int result = 0;
+
+	// Check Left Collision
+	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX - 0.5f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX - 0.5f)] == 1 )
+	{
+		result |= COLLISION_LEFT;
+	}
+
+	// Check Right Collision
+	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX + 0.5f)] == 1 || levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX + 0.5f)] == 1)
+	{
+		result |= COLLISION_RIGHT;
+	}
+
+	// Check Top Collision
+	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX + 0.25f)] == 1 )
+	{
+		result |= COLLISION_TOP;
+	}
+
+	// Check Bottom Collision (Special : Y Need to be lower)
+	if (levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX + 0.25f)] == 1 )
+	{
+		result |= COLLISION_BOTTOM;
+	}
+
+	return result;
 }
 
 void Level::Debug()

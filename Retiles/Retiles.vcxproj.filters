@@ -63,6 +63,9 @@
     <ClInclude Include="Level.h">
       <Filter>Map</Filter>
     </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameObj">

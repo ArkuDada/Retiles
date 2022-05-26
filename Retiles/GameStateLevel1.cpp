@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Level.h"
 
+#define GRAVITY -45.0f
 
 static vector<Chunk*> chunks;
 static vector<Level*> levels;
@@ -15,6 +16,7 @@ static Level* currLevel;
 
 static vector<Sprite*> sprites;
 static vector<GameObject*> gameObjects;
+static Player* sPlayer;
 
 class ObjectType
 {
@@ -22,7 +24,9 @@ public:
 	static enum TYPE {
 		background,
 		player,
-		tiles
+		tiles,
+		spawn,
+		goal
 	};
 };
 
@@ -46,19 +50,25 @@ void GameStateLevel1Load(void)
 	levels.push_back(new Level("Maps/Levels/Level5.txt"));
 	levels.push_back(new Level("Maps/Levels/Level6.txt"));
 
-	//currLevel =levels[5];
-	currLevel = new Level(levels[5], chunks);
+	currLevel =levels[5];
+	//currLevel = new Level(levels[5], chunks);
 	currLevel->Debug();
 
 	//load in sprite
 	sprites.push_back(new Sprite("Sprites/bg.png", 1, 1));
 	sprites.push_back(new Sprite("Sprites/Player.png",4,2));
 	sprites.push_back(new Sprite("Sprites/tiles.png", 1, 1));
+	sprites.push_back(new Sprite("Sprites/Spawn.png", 1, 1));
+	sprites.push_back(new Sprite("Sprites/Goal.png", 1, 1));
 
 	printf("Level1: Load\n");
 }
 
-void GameStateLevel1Init(void) {
+void GameStateLevel1Init(void)
+{
+	gamemode = true;
+	SetCamPosition(CELL_SIZE * 5, CELL_SIZE * 5);
+	SetCamZoom(1.0f);
 
 	//+ Create the background instance
 	//	- Creation order is important when rendering, so we should create the background first
@@ -66,7 +76,10 @@ void GameStateLevel1Init(void) {
 	temp->tag = ObjectType::background;
 	gameObjects.push_back(temp);
 
-	
+	sPlayer = new Player(true, glm::vec3(CELL_SIZE + CELL_SIZE/2, CELL_SIZE + CELL_SIZE/2, 0.0f), glm::vec3(CELL_SIZE, CELL_SIZE, 0.0f), 0.0f, sprites[ObjectType::player]);
+	sPlayer->tag = ObjectType::player;
+	gameObjects.push_back(sPlayer);
+
 
 	printf("Level1: Init\n");
 }
@@ -77,18 +90,50 @@ void CheckGameMode()
 {
 	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
 	{
-		gamemode = true;
+		gamemode = true; //Play mode
+		SetCamPosition(CELL_SIZE*5, CELL_SIZE*5);
 		SetCamZoom(1.0f);
+
+		sPlayer->isActive = gamemode;
+		Cordinate a = { 1, 1 };
+		sPlayer->transform.position = currLevel->mapToWorld(a, gamemode);
 		
 	}
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
 	{
-		gamemode = false;
+		gamemode = false;//Build mode
+		SetCamPosition(0.0f, 0.0f);
 		SetCamZoom(3.5f);
+
+		sPlayer->isActive = gamemode;
+		Cordinate a = { 1, 1 };
+		sPlayer->transform.position = currLevel->mapToWorld(a, gamemode);
 	}
 }
 
-void PlatfromModeUpdate(double dt, long frame, int& state) {}
+void PlatfromModeUpdate(double dt, long frame, int& state)
+{
+	int playerMoveInput = 0;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { playerMoveInput |= PLAYER_LEFT; }
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		playerMoveInput |= PLAYER_RIGHT;
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		playerMoveInput |= PLAYER_JUMP;
+	}
+
+	sPlayer->PlayerInput(playerMoveInput);
+	if (sPlayer->isJumping)
+	{
+		sPlayer->body.velocity.y += GRAVITY * dt;
+	}
+
+	sPlayer->body.UpdatePosByVel(dt);
+	sPlayer->PlayerMapCollisionBehavior(currLevel->checkCollision(sPlayer->transform.position));
+	sPlayer->UpdateAnimation();
+}
 
 void BuildModeUpdate(double dt, long frame, int& state) {}
 
@@ -119,6 +164,7 @@ void GameStateLevel1Update(double dt, long frame, int& state) {
 	//---------------------------------------------------------
 	// Update all game obj position using velocity 
 	//---------------------------------------------------------
+	
 
 
 	//-----------------------------------------
@@ -126,7 +172,7 @@ void GameStateLevel1Update(double dt, long frame, int& state) {
 	//	- wrap ship around the screen
 	//	- destroy bullet that go out of the screen
 	//-----------------------------------------
-
+	
 
 	//-----------------------------------------
 	// Check for collsion, O(n^2)
@@ -168,7 +214,7 @@ void GameStateLevel1Free(void)
 	{
 		delete gameObject;
 	}
-
+	gameObjects.clear();
 	// reset camera
 	ResetCam();
 
@@ -181,14 +227,17 @@ void GameStateLevel1Unload(void) {
 	{
 		delete ch;
 	}
+	chunks.clear();
 	for (auto lvl : levels)
 	{
 		delete lvl;
 	}
+	levels.clear();
 	for (auto spr : sprites)
 	{
 		delete spr;
 	}
+	sprites.clear();
 
 	printf("Level1: Unload\n");
 }

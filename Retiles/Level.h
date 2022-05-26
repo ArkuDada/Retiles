@@ -50,6 +50,9 @@ public:
 	string GetLevelName() { return levelName; }
 	void Draw(Sprite*,bool);
 	void Debug();
+
+	int checkCollision(glm::vec3 position);
+	glm::vec3 mapToWorld(Cordinate cord, bool focus);
 };
 
 

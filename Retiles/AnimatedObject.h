@@ -1,9 +1,11 @@
 #pragma once
 #include "GameObject.h"
+#define ANIM_SPEED 24
 class AnimatedObject :
     public GameObject
 {
 protected:
+    int frame; 
     int curFrame;
     int numFrame;
     float offsetX;
