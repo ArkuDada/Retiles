@@ -31,6 +31,7 @@
     <ClCompile Include="Level.cpp">
       <Filter>Map</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CDT.h" />
@@ -66,6 +67,7 @@
     <ClInclude Include="Collision.h">
       <Filter>Map</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameObj">

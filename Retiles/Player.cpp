@@ -2,17 +2,27 @@
 
 Player::Player(bool active, glm::vec3 pos, glm::vec3 scale, float ori, Sprite* spr):AnimatedObject(active, pos, scale, ori, spr)
 {
-	body = PhysicObject(&transform);
-	isJumping = false;
+	isFalling = false;
 	isWalking = false;
+	superJump = false;
+	canDoubleJump = false;
+	stickyJump = false;
 }
 
 void Player::PlayerInput(int input)
 {
-	if ((input & PLAYER_JUMP) && (!isJumping))
+	
+	if ((input & PLAYER_JUMP) && ((!isFalling && canJump)|| canDoubleJump))
 	{
-		body.velocity.y = JUMP_VELOCITY;
-		isJumping = true;
+		body.velocity.y = superJump?SUPER_JUMP_VELOCITY: JUMP_VELOCITY;
+		if (!canJump && canDoubleJump && !stickyJump)
+		{
+			canDoubleJump = false;
+		}
+		isFalling = true;
+		canJump = false;
+		superJump = false;
+		stickyJump = true;
 	}
 	if (input & PLAYER_LEFT)
 	{
@@ -20,7 +30,7 @@ void Player::PlayerInput(int input)
 		{
 			transform.scale.x *= -1.0f;
 		}
-		body.velocity.x = -(isJumping ? MOVEAIR_VELOCITY_PLAYER : MOVE_VELOCITY_PLAYER);
+		body.velocity.x = -(isFalling ? MOVEAIR_VELOCITY_PLAYER : MOVE_VELOCITY_PLAYER);
 		isWalking = true;
 	}
 	else if (input & PLAYER_RIGHT)
@@ -29,7 +39,7 @@ void Player::PlayerInput(int input)
 		{
 			transform.scale.x *= -1.0f;
 		}
-		body.velocity.x = isJumping? MOVEAIR_VELOCITY_PLAYER:MOVE_VELOCITY_PLAYER;
+		body.velocity.x = isFalling? MOVEAIR_VELOCITY_PLAYER:MOVE_VELOCITY_PLAYER;
 		isWalking = true;
 	}
 	else
@@ -38,10 +48,10 @@ void Player::PlayerInput(int input)
 		offsetX = 0;
 		isWalking = false;
 	}
-	// Play jump animation
-	if (isJumping)
+
+	if (input & PLAYER_STOP_JUMP)
 	{
-		//offsetX = 0.75;	// the 4th sprite of the sheet of 4
+		stickyJump = false;
 	}
 }
 
@@ -64,6 +74,7 @@ void Player::PlayerMapCollisionBehavior(int mapCollsionFlag)
 	{
 		transform.position.y = (int)transform.position.y + 0.5f;
 		body.velocity.y = 0.0f;
+		transform.position.y = (int)transform.position.y - 1.0f;
 	}
 
 	//+ Player is on the ground or just landed on the ground
@@ -71,13 +82,13 @@ void Player::PlayerMapCollisionBehavior(int mapCollsionFlag)
 	{
 		transform.position.y = (int)transform.position.y + 0.75f;
 		body.velocity.y = 0.0f;
-		isJumping = false;
+		isFalling = false;
+		canJump = true;
 	}
 	//+ Player is jumping/falling
-	
 	else
 	{
-		//isJumping = true;
+		isFalling = true;
 	}
 }
 
@@ -92,6 +103,7 @@ void Player::UpdateAnimation()
 	if (isWalking)
 	{
 		offsetY = 0.5f;
+		
 		numFrame = 4;
 		curFrame = (curFrame++) % numFrame;
 		offsetX = (float)curFrame / numFrame;
@@ -100,5 +112,10 @@ void Player::UpdateAnimation()
 	{
 		offsetX = 0.0f;
 		offsetY = 0.0f;
+	}
+
+	if (canDoubleJump)
+	{
+		offsetY += 0.25f;
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "CDT.h"
 
+#define COLLISION_OFFSET 0.25f
+
 using namespace glm;
 
 class Transform
@@ -16,5 +18,7 @@ public:
 	Transform(vec3 pos, vec3 scale,float ori);
 	void UpdateModelMat();
 	mat4 GetModelMat() { return modelMatrix; }
+
+	bool checkCollision(Transform check);
 };
 

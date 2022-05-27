@@ -7,12 +7,13 @@
 
 void Level::appendSpecialTiles()
 {
+	specialTiles.clear();
 	for (int y = 0; y < MapSize.y; y++) {
 		for (int x = 0; x < MapSize.x; x++) {
 			if (levelGrid[y][x] > Tiles::block)
 			{
-				Cordinate temp = { x,y };
-				Tiles speTile((Tiles::TILETYPE)levelGrid[y][x], temp);
+				Cordinate temp_cord = { x,  MapSize. y- 1 -y };
+				Tiles speTile((Tiles::TILETYPE)levelGrid[y][x], temp_cord);
 				specialTiles.push_back(speTile);
 			}
 		}
@@ -64,13 +65,8 @@ Level::Level(Level* ori, vector<Chunk*> overlay)
 {
 	LoadLevelFromFile(ori->levelName);
 
-	for (int i = 0; i < anchors.size(); i++)
+	for (int i = 0; i < anchors.size() && i < overlay.size(); i++)
 	{
-		if (i >= overlay.size())
-		{
-			return;
-		}
-
 		for (int y = 0; y < CHUNKSIZE; y++)
 		{
 			for (int x = 0; x < CHUNKSIZE; x++)
@@ -89,7 +85,7 @@ Level::Level(Level* ori, vector<Chunk*> overlay)
 		}
 	}
 	appendSpecialTiles();
-	//Debug();
+	Debug();
 }
 
 void Level::Draw(Sprite* sprite,bool focus)
@@ -175,7 +171,7 @@ void Level::Debug()
 	{
 		for (int x = 0; x < MapSize.x; x++)
 		{
-			printf("%d",levelGrid[MapSize.y-1 - y][x]);
+			printf("%d",levelGrid[y][x]);
 		}
 		printf("\n");
 	}

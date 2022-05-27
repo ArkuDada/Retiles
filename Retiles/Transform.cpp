@@ -31,3 +31,18 @@ void Transform::UpdateModelMat()
 		// Concatenate the 3 matrix to from Model Matrix
 		modelMatrix = tMat * sMat * rMat;
 }
+
+bool Transform::checkCollision(Transform check)
+{
+	float rightA = position.x + (fabs(scale.x) / 2.0f) - COLLISION_OFFSET;
+	float leftA = position.x - (fabs(scale.x) / 2.0f) + COLLISION_OFFSET;
+	float topA = position.y + (fabs(scale.y) / 2.0f) - COLLISION_OFFSET;
+	float bottomA = position.y - (fabs(scale.y) / 2.0f) + COLLISION_OFFSET;
+
+	float rightB = check.position.x + (fabs(check.scale.x) / 2.0f) - COLLISION_OFFSET;
+	float leftB = check.position.x - (fabs(check.scale.x) / 2.0f) + COLLISION_OFFSET;
+	float topB = check.position.y + (fabs(check.scale.y) / 2.0f) - COLLISION_OFFSET;
+	float bottomB = check.position.y - (fabs(check.scale.y) / 2.0f) + COLLISION_OFFSET;
+
+	return !(leftA > rightB || leftB > rightA || bottomA > topB || bottomB > topA);
+}

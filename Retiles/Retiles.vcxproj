@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedObject.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CDT.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Collision.h" />
@@ -37,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedObject.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CDT.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="GameObject.cpp" />

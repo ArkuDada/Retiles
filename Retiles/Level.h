@@ -9,7 +9,7 @@ using namespace std;
 
 #define CELL_SIZE 50
 
-static Cordinate AnchorRef[] = { {0,0},{CHUNKSIZE-1,0},{CHUNKSIZE - 1,CHUNKSIZE - 1},{(CHUNKSIZE*2)-1,0},{(CHUNKSIZE*2)-1,CHUNKSIZE - 1},{(CHUNKSIZE*2)-1,(CHUNKSIZE*2)-1}};
+static Cordinate AnchorRef[] = { {0,0},{9,0},{9,9},{18,0},{18,9},{18,18}};
 
 class Tiles
 {
@@ -19,7 +19,10 @@ public:
 		air,
 		block,
 		spawn,
-		goal
+		goal,
+		spike,
+		jumppad,
+		doublejump
 	};
 private:
 	TILETYPE type;
@@ -48,6 +51,7 @@ public:
 	Level(string filename);
 	Level(Level* base, vector<Chunk*> overlay);
 	string GetLevelName() { return levelName; }
+	Cordinate GetMapSize() { return MapSize; }
 	void Draw(Sprite*,bool);
 	void Debug();
 
