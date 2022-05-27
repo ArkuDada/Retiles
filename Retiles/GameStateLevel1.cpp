@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <irrKlang.h>
 
 #include "GameStateLevel1.h"
 #include "CDT.h"
@@ -29,6 +30,10 @@ static Camera* cam;
 
 static vector<int> selectedChunk;
 static bool haveSpawn;
+static bool win;
+
+static irrklang::ISoundEngine* audioEngine;
+static  irrklang::ISound* playerWalk;
 
 class ObjectType
 {
@@ -43,6 +48,7 @@ public:
 		spike,
 		jumppad,
 		doublejump,
+		win
 	};
 };
 
@@ -51,6 +57,15 @@ static int stage;
 // -------------------------------------------
 // Game states function
 // -------------------------------------------
+
+void ResetUI()
+{
+	for (int i = 0; i < uiObjects.size(); i++)
+	{
+		uiObjects[i]->isActive = i <= stage;
+	}
+}
+
 void BuildLevel()
 {
 	delete currLevel;
@@ -163,14 +178,24 @@ void GameStateLevel1Load(void)
 	sprites.push_back(new Sprite("Sprites/Spike.png", 1, 1));
 	sprites.push_back(new Sprite("Sprites/JumpPad.png", 1, 1));
 	sprites.push_back(new Sprite("Sprites/DoubleJump.png", 1, 1));
+	sprites.push_back(new Sprite("Sprites/youwin.png", 1, 1));
 
 	stage = STARTLEVEL;
 	
+	audioEngine = irrklang::createIrrKlangDevice();
+	audioEngine->setSoundVolume(0.25f);
+	audioEngine->play2D("Audio/bgm1.wav", true);
+	playerWalk = audioEngine->play2D("Audio/walk2.wav", true, true, true);
+	playerWalk->setVolume(10.0f);
+	
+	win = false;
+
 	printf("Level1: Load\n");
 }
 
 void GameStateLevel1Init(void)
 {
+
 	gamemode = true;
 	SetCamPosition(CELL_SIZE * 5, CELL_SIZE * 5);
 	SetCamZoom(1.0f);
@@ -200,6 +225,9 @@ void GameStateLevel1Init(void)
 		tempUI->offsetX = (float)i / 8;
 		uiObjects.push_back(tempUI);
 	}
+
+	ResetUI();
+
 	printf("Level1: Init\n");
 }
 
@@ -213,6 +241,28 @@ void LoadNewLevel()
 	sPlayer->isActive = gamemode;
 	sPlayer->transform.position = currSpawn->transform.position;
 	sPlayer->isFalling = true;
+
+	if (win)
+	{
+		gamemode = false;//Build mode
+		SetCamPosition(0.0f, 0.0f);
+		SetCamZoom(3.5f);
+
+		BuildLevel();
+
+		sPlayer->isActive = gamemode;
+
+		for (GameObject* obj: gameObjects)
+		{
+			if (obj->tag != ObjectType::background)
+			{
+			obj->isActive = false;
+
+			}
+		}
+		gameObjects.push_back(new GameObject(true, glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(700.0f * 4, 100.0f * 4, 10.0f), 0.0f, sprites[ObjectType::win]));
+	}
+
 }
 
 void CheckGameMode()
@@ -221,6 +271,7 @@ void CheckGameMode()
 	{
 		gamemode = true; //Play mode
 		LoadNewLevel();
+		
 		
 	}
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
@@ -267,6 +318,8 @@ void PlatformModeUpdate(double dt, long frame, int& state)
 
 	cam->UpdateCamera();
 
+	playerWalk->setIsPaused(!(sPlayer->body.velocity.x != 0 && !sPlayer->isFalling));
+
 	for (GameObject* obj : gameObjects)
 	{
 		if (obj->tag == ObjectType::jumppad && obj->isActive)
@@ -296,37 +349,43 @@ void PlatformModeUpdate(double dt, long frame, int& state)
 
 	for (GameObject* obj: gameObjects)
 	{
-		if (obj->tag < ObjectType::goal || !obj->isActive)
+		bool escape = false;
+		if (!obj->isActive)continue;
+	
+		if (obj->tag >= ObjectType::goal)
 		{
-			continue;
-		}
-		bool collide = sPlayer->transform.checkCollision(obj->transform);
-		if (collide)
-		{
-			switch (obj->tag)
+			bool collide = sPlayer->transform.checkCollision(obj->transform);
+			if (collide)
 			{
-			case ObjectType::goal:
-				stage++;
-				if (stage == levels.size())
+				switch (obj->tag)
 				{
-					stage = levels.size() - 1;
+				case ObjectType::goal:
+					stage++;
+					if (stage == levels.size()-1)
+					{
+						win = true;
+					}
+					selectedChunk.clear();
+					ResetUI();
+					LoadNewLevel();
+					escape = true;
+					break;
+				case ObjectType::spike:
+					LoadNewLevel();
+					break;
+				case ObjectType::jumppad:
+					sPlayer->superJump = true;
+					break;
+				case ObjectType::doublejump:
+					sPlayer->canDoubleJump = true;
+					break;
+				default:
+					break;
 				}
-				selectedChunk.clear();
-				LoadNewLevel();
-				break;
-			case ObjectType::spike:
-				LoadNewLevel();
-				break;
-			case ObjectType::jumppad:
-				sPlayer->superJump = true;
-				break;
-			case ObjectType::doublejump:
-				sPlayer->canDoubleJump = true;
-				break;
-			default:
-				break;
 			}
 		}
+
+		if (escape)break;
 	}
 }
 
@@ -335,6 +394,7 @@ void AddChunk(int input)
 	if (input == -1)
 	{
 		selectedChunk.clear();
+		ResetUI();
 		return;
 	}
 
@@ -344,7 +404,12 @@ void AddChunk(int input)
 		if (i == input) return;
 	}
 
+	
+	if (uiObjects[input - 1]->isActive)
+	{
 	selectedChunk.push_back(input);
+	uiObjects[input - 1]->isActive = false;
+	}
 }
 
 void BuildModeUpdate(double dt, long frame, int& state)
@@ -379,6 +444,10 @@ void BuildModeUpdate(double dt, long frame, int& state)
 
 void GameStateLevel1Update(double dt, long frame, int& state) {
 
+	if (win)
+	{
+		return;
+	}
 	//-----------------------------------------
 	// Get user input
 	//-----------------------------------------
@@ -401,18 +470,6 @@ void GameStateLevel1Update(double dt, long frame, int& state) {
 		BuildModeUpdate(dt, frame, state);
 	}
 
-	//---------------------------------------------------------
-	// Update all game obj position using velocity 
-	//---------------------------------------------------------
-	
-
-	//-----------------------------------------
-	// Check for collsion, O(n^2)
-	//-----------------------------------------
-
-
-	//-----------------------------------------
-	// Update modelMatrix of all game obj
 	//-----------------------------------------
 	for (auto gameObject : gameObjects)
 	{
@@ -447,13 +504,16 @@ void GameStateLevel1Draw(void) {
 	}
 
 	// Swap the buffer, to present the drawing
-	currLevel->Draw(sprites[ObjectType::tiles], gamemode);
-
-	for (auto ui : uiObjects)
+	if (!win)
 	{
-		if (ui->isActive)
+		currLevel->Draw(sprites[ObjectType::tiles], gamemode);
+
+		for (auto ui : uiObjects)
 		{
-			ui->Draw();
+			if (ui->isActive)
+			{
+				ui->Draw();
+			}
 		}
 	}
 
@@ -467,6 +527,11 @@ void GameStateLevel1Free(void)
 		delete gameObject;
 	}
 	gameObjects.clear();
+	for (auto ui : uiObjects)
+	{
+		delete ui;
+	}
+	uiObjects.clear();
 	// reset camera
 	ResetCam();
 
@@ -492,6 +557,9 @@ void GameStateLevel1Unload(void) {
 	sprites.clear();
 
 	delete cam;
+
+	playerWalk->drop();
+	audioEngine->drop();
 
 	printf("Level1: Unload\n");
 }

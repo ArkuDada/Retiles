@@ -61,7 +61,7 @@ int		win_height = 768;
 int main(void){
 
 	// Initialize the System (GFW, GLEW, Input, Create window)
-	SystemInit(win_width, win_height, "Hoard");
+	SystemInit(win_width, win_height, "Re:tiles :: In Space");
 	CDTInit(win_width, win_height);
 
 	// Initialize Game State (to level 1)

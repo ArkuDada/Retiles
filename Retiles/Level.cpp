@@ -134,31 +134,39 @@ int Level::checkCollision(glm::vec3 position)
 {
 	float PosX = (position.x- CELL_SIZE / 2)/CELL_SIZE + 0.5f;
 	float PosY = (position.y - CELL_SIZE / 2) / CELL_SIZE + 0.5f;
-	std::cout << PosX << "," << PosY << endl;
+	//std::cout << PosX << "," << PosY << endl;
 	int result = 0;
 
 	// Check Left Collision
-	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX - 0.5f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX - 0.5f)] == 1 )
+	try
 	{
-		result |= COLLISION_LEFT;
-	}
+		
+		if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX - 0.5f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX - 0.5f)] == 1 )
+		{
+			result |= COLLISION_LEFT;
+		}
+		
+		// Check Right Collision
+		if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX + 0.5f)] == 1 || levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX + 0.5f)] == 1)
+		{
+			result |= COLLISION_RIGHT;
+		}
 
-	// Check Right Collision
-	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.25f)][(int)(PosX + 0.5f)] == 1 || levelGrid[MapSize.y - 1 - (int)(PosY - 0.25f)][(int)(PosX + 0.5f)] == 1)
-	{
-		result |= COLLISION_RIGHT;
-	}
+		// Check Top Collision
+		if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX + 0.25f)] == 1 )
+		{
+			result |= COLLISION_TOP;
+		}
 
-	// Check Top Collision
-	if (levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY + 0.5f)][(int)(PosX + 0.25f)] == 1 )
-	{
-		result |= COLLISION_TOP;
+		// Check Bottom Collision (Special : Y Need to be lower)
+		if (levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX + 0.25f)] == 1 )
+		{
+			result |= COLLISION_BOTTOM;
+		}
 	}
-
-	// Check Bottom Collision (Special : Y Need to be lower)
-	if (levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX - 0.25f)] == 1|| levelGrid[MapSize.y - 1 - (int)(PosY - 0.5f)][(int)(PosX + 0.25f)] == 1 )
+	catch (const std::exception&)
 	{
-		result |= COLLISION_BOTTOM;
+
 	}
 
 	return result;

@@ -7,15 +7,17 @@ Player::Player(bool active, glm::vec3 pos, glm::vec3 scale, float ori, Sprite* s
 	superJump = false;
 	canDoubleJump = false;
 	stickyJump = false;
+	canJump = false;
 }
 
 void Player::PlayerInput(int input)
 {
 	
-	if ((input & PLAYER_JUMP) && ((!isFalling && canJump)|| canDoubleJump))
+	if ((input & PLAYER_JUMP) && ((!isFalling && canJump)|| canDoubleJump) && !stickyJump)
 	{
+		transform.position.y += 1.5f;
 		body.velocity.y = superJump?SUPER_JUMP_VELOCITY: JUMP_VELOCITY;
-		if (!canJump && canDoubleJump && !stickyJump)
+		if (!canJump && canDoubleJump)
 		{
 			canDoubleJump = false;
 		}
@@ -74,13 +76,13 @@ void Player::PlayerMapCollisionBehavior(int mapCollsionFlag)
 	{
 		transform.position.y = (int)transform.position.y + 0.5f;
 		body.velocity.y = 0.0f;
-		transform.position.y = (int)transform.position.y - 1.0f;
+		transform.position.y = (int)transform.position.y - 0.6f;
 	}
 
 	//+ Player is on the ground or just landed on the ground
 	if (mapCollsionFlag & COLLISION_BOTTOM)
 	{
-		transform.position.y = (int)transform.position.y + 0.75f;
+		transform.position.y = (int)transform.position.y + 0.9f;
 		body.velocity.y = 0.0f;
 		isFalling = false;
 		canJump = true;
